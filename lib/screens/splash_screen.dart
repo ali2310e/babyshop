@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:babyshop/screens/signin_screen.dart';
+import 'package:babyshop/screens/onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -9,7 +9,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -20,16 +21,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    _animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeIn,
-    );
-
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
 
     Timer(const Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const SigninScreen()),
+        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
       );
     });
   }
@@ -50,19 +47,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.child_friendly,
-                size: 100,
-                color: Colors.lightBlueAccent,
-              ),
+              const Icon(Icons.child_friendly,
+                  size: 80, color: Color(0xFF53D3D1)), // Teal Icon
               const SizedBox(height: 20),
-              Text(
+              const Text(
                 'BabyShopHub',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.pinkAccent,
-                  letterSpacing: 1.5,
+                  color: Colors.black87, // Clean dark text
+                  letterSpacing: 1.0,
                 ),
               ),
               const SizedBox(height: 10),

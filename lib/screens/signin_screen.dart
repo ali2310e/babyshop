@@ -50,13 +50,13 @@ class _SigninScreenState extends State<SigninScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 40),
-                  Icon(
+                  const Icon(
                     Icons.child_care,
                     size: 80,
-                    color: Colors.pinkAccent,
+                    color: Color(0xFF53D3D1), // Teal
                   ),
                   const SizedBox(height: 20),
-                  Text(
+                  const Text(
                     'Welcome Back!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -83,6 +83,10 @@ class _SigninScreenState extends State<SigninScreen> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFF53D3D1), width: 2),
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -101,6 +105,10 @@ class _SigninScreenState extends State<SigninScreen> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFF53D3D1), width: 2),
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -113,15 +121,16 @@ class _SigninScreenState extends State<SigninScreen> {
                   ElevatedButton(
                     onPressed: _signIn,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.lightBlueAccent,
+                      backgroundColor: const Color(0xFF53D3D1), // Teal
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(25), // More rounded like reference
                       ),
+                      elevation: 0,
                     ),
                     child: const Text(
                       'Sign In',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -130,13 +139,13 @@ class _SigninScreenState extends State<SigninScreen> {
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(25),
                       ),
-                      side: BorderSide(color: Colors.lightBlueAccent),
+                      side: const BorderSide(color: Color(0xFF53D3D1)),
                     ),
                     child: const Text(
                       'Continue as Guest',
-                      style: TextStyle(fontSize: 18, color: Colors.lightBlueAccent),
+                      style: TextStyle(fontSize: 18, color: Color(0xFF53D3D1)),
                     ),
                   ),
                   const SizedBox(height: 24),

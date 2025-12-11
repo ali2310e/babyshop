@@ -50,10 +50,9 @@ class _SigninScreenState extends State<SigninScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 40),
-                  const Icon(
-                    Icons.child_care,
-                    size: 80,
-                    color: Color(0xFF53D3D1), // Teal
+                  Image.asset(
+                    'assets/login.png',
+                    height: 150, // Adjusted height for login screen
                   ),
                   const SizedBox(height: 20),
                   const Text(

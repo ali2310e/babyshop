@@ -47,9 +47,11 @@ class _SplashScreenState extends State<SplashScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.child_friendly,
-                  size: 80, color: Color(0xFF53D3D1)), // Teal Icon
-              const SizedBox(height: 20),
+              Image.asset(
+                'assets/splash.png',
+                width: 200,
+                // height: 200, // Optional: preserve aspect ratio or force square
+              ),              const SizedBox(height: 20),
               const Text(
                 'BabyShopHub',
                 style: TextStyle(

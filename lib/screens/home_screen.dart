@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:babyshop/models/product.dart';
 import 'package:babyshop/screens/product_detail_screen.dart';
 import 'package:babyshop/screens/cart_screen.dart';
+import 'package:babyshop/models/cart_manager.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool isGuest;

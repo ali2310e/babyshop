@@ -22,10 +22,10 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _pages = [
       HomeContent(isGuest: widget.isGuest),
-      const AccountContent(),
       const ShopNowContent(),
       const SearchContent(),
       const CartContent(),
+      const AccountContent(),
     ];
   }
 
@@ -185,7 +185,7 @@ class _HomeContentState extends State<HomeContent> {
                       height: 50,
                       width: 50,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6F9940), // Green filter button
+                        color: const Color(0xFF53D3D1), // Green filter button
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.tune, color: Colors.white),
@@ -199,7 +199,7 @@ class _HomeContentState extends State<HomeContent> {
                   height: 160,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF6F9940), // Green banner
+                    color: const Color(0xFF53D3D1), // Green banner
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Stack(
@@ -289,7 +289,7 @@ class _HomeContentState extends State<HomeContent> {
                       onPressed: () {},
                       child: const Text(
                         'See All',
-                        style: TextStyle(color: Color(0xFF6F9940)),
+                        style: TextStyle(color: Color(0xFF53D3D1)),
                       ),
                     ),
                   ],
@@ -378,7 +378,7 @@ class _HomeContentState extends State<HomeContent> {
                                 Container(
                                   padding: const EdgeInsets.all(4),
                                   decoration: const BoxDecoration(
-                                    color: Color(0xFF6F9940),
+                                    color: Color(0xFF53D3D1),
                                     shape: BoxShape.circle,
                                   ),
                                   child: const Icon(

@@ -16,7 +16,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF6F9940), // Main green background
+      backgroundColor: const Color(0xFF53D3D1), // Main green background
       appBar: AppBar(
         title: const Text('Details', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
@@ -161,7 +161,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6F9940), // Green button
+                        backgroundColor: const Color(0xFF53D3D1), // Green button
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),

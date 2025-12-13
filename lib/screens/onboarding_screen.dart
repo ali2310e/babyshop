@@ -16,17 +16,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {
       "title": "Earn Baby Rewards",
       "subtitle": "Save more with every diaper and wipe-easy, rewarding, and parent-approved!",
-      "image": "assets/onboarding1.png" // Placeholder
+      "image": "assets/splash.png"
     },
     {
       "title": "Clever Mom Tips",
       "subtitle": "Trusted parenting tips to guide every stage of your baby's early journey.",
-      "image": "assets/onboarding2.png" // Placeholder
+      "image": "assets/splash.png"
     },
     {
       "title": "2.5M Parents Joined",
       "subtitle": "Millions of parents trust BabyShopHub for rewards, tips, and support daily.",
-      "image": "assets/onboarding3.png" // Placeholder
+      "image": "assets/splash.png"
     },
   ];
 
@@ -79,23 +79,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // Placeholder for the 3D Image/Blob
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              width: 280,
-                              height: 280,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF53D3D1).withOpacity(0.2), // Light teal blob
-                                shape: BoxShape.circle, // Simplified shape
-                              ),
-                            ),
-                            const Icon(
-                              Icons.child_care, // Placeholder icon
-                              size: 100,
-                              color: Color(0xFF53D3D1),
-                            ),
-                          ],
+                        Image.asset(
+                          _onboardingData[index]['image']!,
+                          height: 280,
+                          fit: BoxFit.contain,
                         ),
                         const SizedBox(height: 40),
                         Text(

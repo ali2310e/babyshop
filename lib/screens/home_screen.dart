@@ -1,9 +1,80 @@
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final bool isGuest;
 
   const HomeScreen({super.key, this.isGuest = false});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+
+  // List of pages for each tab
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      HomeContent(isGuest: widget.isGuest),
+      const AccountContent(),
+      const ShopNowContent(),
+      const SearchContent(),
+      const CartContent(),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: const Color(0xFF53D3D1), // Teal
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.store),
+            label: 'Shop Now',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Account',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// --- Content Widgets ---
+
+class HomeContent extends StatelessWidget {
+  final bool isGuest;
+
+  const HomeContent({super.key, required this.isGuest});
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +117,70 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class AccountContent extends StatelessWidget {
+  const AccountContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('My Account', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF53D3D1),
+        foregroundColor: Colors.white,
+      ),
+      body: const Center(child: Text('Account Page Placeholder')),
+    );
+  }
+}
+
+class ShopNowContent extends StatelessWidget {
+  const ShopNowContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Shop Now', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF53D3D1),
+        foregroundColor: Colors.white,
+      ),
+      body: const Center(child: Text('Shop Now Page Placeholder')),
+    );
+  }
+}
+
+class SearchContent extends StatelessWidget {
+  const SearchContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Search', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF53D3D1),
+        foregroundColor: Colors.white,
+      ),
+      body: const Center(child: Text('Search Page Placeholder')),
+    );
+  }
+}
+
+class CartContent extends StatelessWidget {
+  const CartContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('My Cart', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF53D3D1),
+        foregroundColor: Colors.white,
+      ),
+      body: const Center(child: Text('Cart Page Placeholder')),
     );
   }
 }

@@ -61,6 +61,7 @@ flutter:
   assets:
     - assets/splash.png
     - assets/login.png
+    - assets/product.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

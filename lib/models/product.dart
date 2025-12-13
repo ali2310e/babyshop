@@ -6,6 +6,9 @@ class Product {
   final double rating;
   final String description;
 
+  final String category;
+  final String brand;
+
   Product({
     required this.id,
     required this.name,
@@ -13,5 +16,7 @@ class Product {
     required this.price,
     required this.rating,
     required this.description,
+    required this.category,
+    required this.brand,
   });
 }

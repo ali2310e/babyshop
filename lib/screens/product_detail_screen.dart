@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:babyshop/models/product.dart';
+import 'package:babyshop/models/cart_manager.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -156,23 +157,34 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const Spacer(),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF53D3D1), // Green button
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          CartManager().addToCart(widget.product,
+                              quantity: quantity);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  'Added $quantity ${widget.product.name} to cart'),
+                              backgroundColor: const Color(0xFF53D3D1), // Teal
+                              duration: const Duration(seconds: 1),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF53D3D1), // Green button
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: const Text(
+                          'Add to Cart',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      child: const Text(
-                        'Add to Cart',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
                     ),
-                  ),
                 ],
               ),
             ),

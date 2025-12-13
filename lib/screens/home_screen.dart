@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:babyshop/models/product.dart';
 import 'package:babyshop/screens/product_detail_screen.dart';
+import 'package:babyshop/screens/cart_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool isGuest;
@@ -24,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
       HomeContent(isGuest: widget.isGuest),
       const ShopNowContent(),
       const SearchContent(),
-      const CartContent(),
+      const CartScreen(),
       const AccountContent(),
     ];
   }
@@ -83,44 +84,132 @@ class HomeContent extends StatefulWidget {
 }
 
 class _HomeContentState extends State<HomeContent> {
-  // Dummy Products Data
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  String _selectedCategory = 'All';
+
+  final List<String> _categories = [
+    'All',
+    'Skincare',
+    'Clothing',
+    'Toys',
+    'Food',
+    'Diapers'
+  ];
+
+  // Products Data
   final List<Product> _products = [
     Product(
       id: '1',
-      name: 'Body Milk',
-      image: 'assets/product.png',
+      name: 'Baby Lotion',
+      image: 'assets/products/imgi_5_baby_lotion_125ml.jpg',
       price: 45.00,
       rating: 4.8,
-      description: 'Pronounced ba-koo-chi-ol, Bakuchiol is just as potent as Retinol but less irritating to the skin. Perfect for baby\'s sensitive skin.',
+      description: 'Gentle hydration for your little one. Keeps skin soft and smooth all day long.',
+      brand: 'Bebble',
+      category: 'Skincare',
     ),
     Product(
       id: '2',
-      name: 'Baby Lotion',
-      image: 'assets/product.png',
-      price: 45.00,
-      rating: 4.9,
-      description: 'Gentle hydration for your little one. Keeps skin soft and smooth all day long.',
+      name: 'Baby Shampoo',
+      image: 'assets/products/imgi_19_baby_shampoo_125ml.jpg',
+      price: 35.00,
+      rating: 4.7,
+      description: 'Tear-free formula shampoo by Bebble. Cleanses gently without drying out the scalp.',
+       brand: 'Bebble',
+      category: 'Skincare',
     ),
     Product(
       id: '3',
-      name: 'Body Wash',
-      image: 'assets/product.png',
-      price: 35.00,
-      rating: 4.7,
-      description: 'Tear-free formula body wash. Cleanses gently without drying out the skin.',
-    ),
-    Product(
-      id: '4',
-      name: 'Body Oil',
-      image: 'assets/product.png',
+      name: 'Baby Oil Lavender',
+      image: 'assets/products/imgi_17_baby_oil_lavender_125ml.jpg',
       price: 45.00,
       rating: 4.9,
-      description: 'Rich and nourishing body oil. Ideal for massage and locking in moisture.',
+      description: 'Rich and nourishing body oil with calming lavender. Ideal for massage and locking in moisture.',
+      brand: 'Bebble',
+      category: 'Skincare',
+    ),
+     Product(
+      id: '4',
+      name: 'Sweet Almond Lotion',
+      image: 'assets/products/imgi_14_sweet_almond_lotion_250ml.jpg',
+      price: 55.00,
+      rating: 4.9,
+      description: 'Enriched with sweet almond oil, this lotion provides deep nourishment for delicate skin.',
+      brand: 'Bebble',
+      category: 'Skincare',
+    ),
+    Product(
+      id: '5',
+      name: 'Magic Diapers (S)',
+      image: 'assets/products/imgi_29_Bona_Papa_Magic_Diapers_-_S-2_Mini_3-6kg_Mega_Pack_96_Pcs_180x.png',
+      price: 25.00,
+      rating: 4.6,
+      description: 'Bona Papa Magic Diapers, Size S (3-6kg). Mega Pack 96 Pcs for long-lasting dryness.',
+      brand: 'Bona Papa',
+      category: 'Diapers',
+    ),
+    Product(
+      id: '6',
+      name: 'Mild Wipes',
+      image: 'assets/products/imgi_35_64_mild_wipes.jpg',
+      price: 15.00,
+      rating: 4.5,
+      description: 'Soft and mild wipes for easy cleaning. Pack of 64.',
+      brand: 'Bebble',
+      category: 'Diapers',
+    ),
+    Product(
+      id: '7',
+      name: 'Bottle Soap',
+      image: 'assets/products/imgi_8_feeding_bottle_soap_450ml.jpg',
+      price: 12.00,
+      rating: 4.8,
+      description: 'To gently clean feeding bottles, teats, and utensils. Safe and effective.',
+      brand: 'Bebble',
+      category: 'Food',
+    ),
+    Product(
+      id: '8',
+      name: 'Baby Soap Aloe',
+      image: 'assets/products/imgi_15_baby_soap_alo_vera.jpg',
+      price: 8.00,
+      rating: 4.4,
+      description: 'Creamy baby soap with Aloe Vera extract for soothing bath time.',
+      brand: 'Bebble',
+      category: 'Skincare',
+    ),
+      Product(
+      id: '9',
+      name: 'Magic Diapers (M)',
+      image: 'assets/products/imgi_31_Bona_Papa_Magic_Diapers_-_M-3_Midi_5-10kg_Mega_Pack_88_Pcs_180x.png',
+      price: 28.00,
+      rating: 4.7,
+      description: 'Bona Papa Magic Diapers, Size M (5-10kg). Mega Pack 88 Pcs.',
+      brand: 'Bona Papa',
+      category: 'Diapers',
     ),
   ];
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Filter Products
+    final filteredProducts = _products.where((product) {
+      final matchQuery = product.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          product.brand.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          product.category.toLowerCase().contains(_searchQuery.toLowerCase());
+      
+      final matchCategory = _selectedCategory == 'All' || product.category == _selectedCategory;
+
+      return matchQuery && matchCategory;
+    }).toList();
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -169,6 +258,12 @@ class _HomeContentState extends State<HomeContent> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: TextField(
+                                controller: _searchController,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _searchQuery = value;
+                                  });
+                                },
                                 decoration: InputDecoration(
                                   hintText: 'Search...',
                                   hintStyle: TextStyle(color: Colors.grey[400]),
@@ -273,6 +368,43 @@ class _HomeContentState extends State<HomeContent> {
                 ),
                 const SizedBox(height: 24),
 
+                // Categories Screen
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: _categories.map((category) {
+                      final isSelected = _selectedCategory == category;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedCategory = category;
+                          });
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? const Color(0xFF53D3D1)
+                                : Colors.grey[200],
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Text(
+                            category,
+                            style: TextStyle(
+                              color:
+                                  isSelected ? Colors.white : Colors.black87,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
                 // Popular Section Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -306,9 +438,9 @@ class _HomeContentState extends State<HomeContent> {
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
                   ),
-                  itemCount: _products.length,
+                  itemCount: filteredProducts.length,
                   itemBuilder: (context, index) {
-                    final product = _products[index];
+                    final product = filteredProducts[index];
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(

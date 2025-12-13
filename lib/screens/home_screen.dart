@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:babyshop/models/product.dart';
+import 'package:babyshop/screens/product_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool isGuest;

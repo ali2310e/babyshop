@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedItemColor: const Color(0xFF53D3D1), // Teal
         unselectedItemColor: Colors.grey,
         showUnselectedLabels: true,
-        items: const [
+        items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -60,7 +60,16 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Search',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
+            icon: ListenableBuilder(
+              listenable: CartManager(),
+              builder: (context, child) {
+                return Badge(
+                  isLabelVisible: CartManager().items.isNotEmpty,
+                  label: Text('${CartManager().items.length}'),
+                  child: const Icon(Icons.shopping_cart),
+                );
+              },
+            ),
             label: 'Cart',
           ),
           BottomNavigationBarItem(
@@ -232,10 +241,41 @@ class _HomeContentState extends State<HomeContent> {
                         color: Colors.black87,
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.shopping_cart_outlined),
-                      onPressed: () {},
-                      color: Colors.black87,
+                    Stack(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.shopping_cart_outlined),
+                          onPressed: () {},
+                          color: Colors.black87,
+                        ),
+                        ListenableBuilder(
+                          listenable: CartManager(),
+                          builder: (context, child) {
+                            if (CartManager().items.isEmpty) {
+                              return const SizedBox.shrink();
+                            }
+                            return Positioned(
+                              right: 5,
+                              top: 5,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text(
+                                  '${CartManager().items.length}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -509,15 +549,32 @@ class _HomeContentState extends State<HomeContent> {
                                   ),
                                 ),
                                 Container(
-                                  padding: const EdgeInsets.all(4),
                                   decoration: const BoxDecoration(
                                     color: Color(0xFF53D3D1),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(
-                                    Icons.add,
-                                    color: Colors.white,
-                                    size: 20,
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.add,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                    onPressed: () {
+                                      CartManager().addToCart(product);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                              'Added ${product.name} to cart'),
+                                          backgroundColor:
+                                              const Color(0xFF53D3D1), // Teal
+                                          duration:
+                                              const Duration(milliseconds: 500),
+                                        ),
+                                      );
+                                    },
+                                    constraints: const BoxConstraints(),
+                                    padding: const EdgeInsets.all(4),
                                   ),
                                 ),
                               ],

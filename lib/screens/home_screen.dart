@@ -6,8 +6,9 @@ import 'package:babyshop/models/cart_manager.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool isGuest;
+  final int initialIndex;
 
-  const HomeScreen({super.key, this.isGuest = false});
+  const HomeScreen({super.key, this.isGuest = false, this.initialIndex = 0});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -22,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _currentIndex = widget.initialIndex;
     _pages = [
       HomeContent(isGuest: widget.isGuest),
       const ShopNowContent(),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:babyshop/models/product.dart';
 import 'package:babyshop/models/cart_manager.dart';
+import 'package:babyshop/screens/home_screen.dart'; // Import HomeScreen
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -191,6 +192,63 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0, // Default to Home or none
+        onTap: (index) {
+          // Navigate to Home and select the tab
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+                builder: (context) => _HomeScreenWrapper(initialIndex: index)),
+            (route) => false,
+          );
+        },
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.grey, // Not selected
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
+        items: [
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.store),
+            label: 'Shop Now',
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: ListenableBuilder(
+              listenable: CartManager(),
+              builder: (context, child) {
+                return Badge(
+                  isLabelVisible: CartManager().items.isNotEmpty,
+                  label: Text('${CartManager().items.length}'),
+                  child: const Icon(Icons.shopping_cart),
+                );
+              },
+            ),
+            label: 'Cart',
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Account',
+          ),
+        ],
+      ),
     );
+  }
+}
+// Wrapper to allow passing initial index to HomeScreen
+class _HomeScreenWrapper extends StatelessWidget {
+  final int initialIndex;
+
+  const _HomeScreenWrapper({required this.initialIndex});
+
+  @override
+  Widget build(BuildContext context) {
+    return HomeScreen(initialIndex: initialIndex);
   }
 }

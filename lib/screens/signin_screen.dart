@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:babyshop/screens/signup_screen.dart';
 import 'package:babyshop/screens/home_screen.dart';
+import 'package:babyshop/models/auth_manager.dart';
 
 class SigninScreen extends StatefulWidget {
   const SigninScreen({super.key});
@@ -23,16 +24,18 @@ class _SigninScreenState extends State<SigninScreen> {
 
   void _signIn() {
     if (_formKey.currentState!.validate()) {
-      // TODO: Implement actual sign in logic
+      // Mock Sign In
+      AuthManager().login("Mitchal", _emailController.text);
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen(isGuest: false)),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     }
   }
 
   void _guestMode() {
+    AuthManager().loginAsGuest();
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const HomeScreen(isGuest: true)),
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
     );
   }
 

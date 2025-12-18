@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:babyshop/models/cart_manager.dart';
+import 'package:babyshop/screens/checkout_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -34,41 +35,10 @@ class _CartScreenState extends State<CartScreen> {
       );
       return;
     }
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CheckoutScreen()),
     );
-
-    // Simulate payment processing
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.of(context).pop(); // Close loading
-      _cartManager.clearCart();
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Icon(Icons.check_circle, color: Color(0xFF53D3D1), size: 60),
-          content: const Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Order Confirmed!',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              Text('Thank you for your purchase.'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK', style: TextStyle(color: Color(0xFF53D3D1))),
-            ),
-          ],
-        ),
-      );
-    });
   }
 
   @override
@@ -121,12 +91,27 @@ class _CartScreenState extends State<CartScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  item.product.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        item.product.name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () => _cartManager.removeFromCart(item.product),
+                                      icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                                      constraints: const BoxConstraints(),
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                  ],
                                 ),
                                 Text(
                                   item.product.category,

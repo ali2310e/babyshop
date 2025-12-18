@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:babyshop/models/product.dart';
 import 'package:babyshop/screens/product_detail_screen.dart';
@@ -5,8 +6,10 @@ import 'package:babyshop/screens/account_screen.dart';
 import 'package:babyshop/screens/shop_screen.dart';
 import 'package:babyshop/screens/search_screen.dart';
 import 'package:babyshop/screens/cart_screen.dart';
+import 'package:babyshop/screens/wishlist_screen.dart';
 import 'package:babyshop/models/cart_manager.dart';
 import 'package:babyshop/models/auth_manager.dart';
+import 'package:babyshop/models/wishlist_manager.dart';
 
 class HomeScreen extends StatefulWidget {
   final int initialIndex;
@@ -99,6 +102,7 @@ class HomeContent extends StatefulWidget {
 
 class _HomeContentState extends State<HomeContent> {
   final TextEditingController _searchController = TextEditingController();
+  final WishlistManager _wishlistManager = WishlistManager();
   String _searchQuery = '';
   String _selectedCategory = 'All';
 
@@ -111,12 +115,46 @@ class _HomeContentState extends State<HomeContent> {
     'Diapers'
   ];
 
+  // Slider Data
+  final List<String> _sliderImages = [
+    'assets/slider/imgi_1_8f9159bf-1000-48e3-a7c1-4378a3e34e48.png',
+    'assets/slider/imgi_20_baby-shop-horizontal-banner-template-design-2fc1f89a7c07762713632b0c6970ed94_screen.jpg',
+  ];
+
+  int _currentSliderPage = 0;
+  final PageController _pageController = PageController();
+  Timer? _sliderTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startSliderTimer();
+  }
+
+  void _startSliderTimer() {
+    _sliderTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      if (_pageController.hasClients) {
+        int nextPage = _currentSliderPage + 1;
+        if (nextPage >= _sliderImages.length) {
+          nextPage = 0;
+        }
+        _pageController.animateToPage(
+          nextPage,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
   // Products Data
   final List<Product> _products = Product.sampleProducts;
 
   @override
   void dispose() {
     _searchController.dispose();
+    _pageController.dispose();
+    _sliderTimer?.cancel();
     super.dispose();
   }
 
@@ -159,39 +197,92 @@ class _HomeContentState extends State<HomeContent> {
                           );
                         },
                       ),
-                    Stack(
+                    Row(
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.shopping_cart_outlined),
-                          onPressed: () {},
-                          color: Colors.black87,
-                        ),
-                        ListenableBuilder(
-                          listenable: CartManager(),
-                          builder: (context, child) {
-                            if (CartManager().items.isEmpty) {
-                              return const SizedBox.shrink();
-                            }
-                            return Positioned(
-                              right: 5,
-                              top: 5,
-                              child: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Text(
-                                  '${CartManager().items.length}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
+                        Stack(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.favorite_border),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const WishlistScreen()),
+                                );
+                              },
+                              color: Colors.black87,
+                            ),
+                            ListenableBuilder(
+                              listenable: _wishlistManager,
+                              builder: (context, child) {
+                                if (_wishlistManager.items.isEmpty) {
+                                  return const SizedBox.shrink();
+                                }
+                                return Positioned(
+                                  right: 5,
+                                  top: 5,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF53D3D1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Text(
+                                      '${_wishlistManager.items.length}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            );
-                          },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        Stack(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.shopping_cart_outlined),
+                              onPressed: () {
+                                // Navigate to cart tab or screen? 
+                                // Since we are in HomeContent, maybe we should tell the parent to switch tab
+                                // but for now let's just push a screen for simplicity or if the user wants it.
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const CartScreen()),
+                                );
+                              },
+                              color: Colors.black87,
+                            ),
+                            ListenableBuilder(
+                              listenable: CartManager(),
+                              builder: (context, child) {
+                                if (CartManager().items.isEmpty) {
+                                  return const SizedBox.shrink();
+                                }
+                                return Positioned(
+                                  right: 5,
+                                  top: 5,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Text(
+                                      '${CartManager().items.length}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -248,80 +339,54 @@ class _HomeContentState extends State<HomeContent> {
                 ),
                 const SizedBox(height: 24),
 
-                // Banner
-                Container(
-                  height: 160,
+                // Banner Slider
+                SizedBox(
+                  height: 180,
                   width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF53D3D1), // Green banner
-                    borderRadius: BorderRadius.circular(20),
-                  ),
                   child: Stack(
+                    alignment: Alignment.bottomCenter,
                     children: [
+                      PageView.builder(
+                        controller: _pageController,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentSliderPage = index;
+                          });
+                        },
+                        itemCount: _sliderImages.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              image: DecorationImage(
+                                image: AssetImage(_sliderImages[index]),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                       Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              '\$60.00',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const Text(
-                              'Facial Cream',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 6),
+                          children: List.generate(
+                            _sliderImages.length,
+                            (index) => Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: _currentSliderPage == index ? 20 : 8,
+                              height: 8,
                               decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Text(
-                                '20% off',
-                                style: TextStyle(
-                                  color: Color(0xFFE65100), // Orange
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                ),
+                                color: _currentSliderPage == index
+                                    ? const Color(0xFF53D3D1)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(4),
                               ),
                             ),
-                          ],
+                          ),
                         ),
                       ),
-                      Positioned(
-                        right: -10,
-                        bottom: 10,
-                        child: Image.asset(
-                          'assets/product.png', // Reusing placeholder
-                          height: 120,
-                          width: 120,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                      const Positioned(
-                         bottom: 12,
-                         right: 140,
-                         child: Row(
-                           children: [
-                             CircleAvatar(radius: 3, backgroundColor: Colors.white),
-                             SizedBox(width: 4),
-                             CircleAvatar(radius: 3, backgroundColor: Colors.white54),
-                             SizedBox(width: 4),
-                             CircleAvatar(radius: 3, backgroundColor: Colors.white54),
-                           ],
-                         ),
-                      )
                     ],
                   ),
                 ),
@@ -428,10 +493,21 @@ class _HomeContentState extends State<HomeContent> {
                           children: [
                             Align(
                               alignment: Alignment.topRight,
-                              child: Icon(
-                                Icons.favorite_border,
-                                size: 20,
-                                color: Colors.grey[400],
+                              child: ListenableBuilder(
+                                listenable: _wishlistManager,
+                                builder: (context, child) {
+                                  final isInWishlist = _wishlistManager.isInWishlist(product);
+                                  return GestureDetector(
+                                    onTap: () {
+                                      _wishlistManager.toggleWishlist(product);
+                                    },
+                                    child: Icon(
+                                      isInWishlist ? Icons.favorite : Icons.favorite_border,
+                                      size: 20,
+                                      color: isInWishlist ? Colors.red : Colors.grey[400],
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                             Expanded(

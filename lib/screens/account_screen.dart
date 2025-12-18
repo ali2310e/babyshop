@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:babyshop/models/auth_manager.dart';
 import 'package:babyshop/screens/signin_screen.dart';
+import 'package:babyshop/screens/wishlist_screen.dart';
+import 'package:babyshop/screens/order_history_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -79,7 +81,12 @@ class AccountScreen extends StatelessWidget {
                   _buildAccountTile(
                     icon: Icons.shopping_bag_outlined,
                     title: 'My Orders',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const OrderHistoryScreen()),
+                      );
+                    },
                   ),
                   _buildAccountTile(
                     icon: Icons.location_on_outlined,
@@ -94,7 +101,12 @@ class AccountScreen extends StatelessWidget {
                   _buildAccountTile(
                     icon: Icons.favorite_border,
                     title: 'Wishlist',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const WishlistScreen()),
+                      );
+                    },
                   ),
                   _buildAccountTile(
                     icon: Icons.help_outline,
@@ -104,12 +116,14 @@ class AccountScreen extends StatelessWidget {
                    _buildAccountTile(
                     icon: Icons.logout,
                     title: 'Logout',
-                    onTap: () {
-                      AuthManager().logout();
-                      Navigator.of(context).pushAndRemoveUntil(
-                         MaterialPageRoute(builder: (context) => const SigninScreen()),
-                        (route) => false,
-                      );
+                    onTap: () async {
+                      await AuthManager().logout();
+                      if (context.mounted) {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => const SigninScreen()),
+                          (route) => false,
+                        );
+                      }
                     },
                     isDestructive: true,
                   ),

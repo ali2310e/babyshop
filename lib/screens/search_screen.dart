@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:babyshop/models/product.dart';
 import 'package:babyshop/screens/product_detail_screen.dart';
+import 'package:babyshop/models/wishlist_manager.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -12,6 +13,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  final WishlistManager _wishlistManager = WishlistManager();
   final List<Product> _allProducts = Product.sampleProducts;
 
   @override
@@ -276,6 +278,21 @@ class _SearchScreenState extends State<SearchScreen> {
                     ],
                   ),
                 ),
+                ListenableBuilder(
+                  listenable: _wishlistManager,
+                  builder: (context, child) {
+                    final isInWishlist = _wishlistManager.isInWishlist(product);
+                    return GestureDetector(
+                      onTap: () => _wishlistManager.toggleWishlist(product),
+                      child: Icon(
+                        isInWishlist ? Icons.favorite : Icons.favorite_border,
+                        size: 24,
+                        color: isInWishlist ? Colors.red : Colors.grey[400],
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(width: 8),
                 const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
               ],
             ),

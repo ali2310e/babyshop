@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:babyshop/models/product.dart';
 import 'package:babyshop/screens/product_detail_screen.dart';
 import 'package:babyshop/models/cart_manager.dart';
+import 'package:babyshop/models/wishlist_manager.dart';
+import 'package:babyshop/screens/wishlist_screen.dart';
 
 class ShopScreen extends StatefulWidget {
   const ShopScreen({super.key});
@@ -11,6 +13,7 @@ class ShopScreen extends StatefulWidget {
 }
 
 class _ShopScreenState extends State<ShopScreen> {
+  final WishlistManager _wishlistManager = WishlistManager();
   String _selectedCategory = 'All';
   final List<String> _categories = [
     'All',
@@ -38,6 +41,43 @@ class _ShopScreenState extends State<ShopScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
+        actions: [
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.favorite_border, color: Colors.black87),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const WishlistScreen()),
+                  );
+                },
+              ),
+              ListenableBuilder(
+                listenable: _wishlistManager,
+                builder: (context, child) {
+                  if (_wishlistManager.items.isEmpty) return const SizedBox.shrink();
+                  return Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF53D3D1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        '${_wishlistManager.items.length}',
+                        style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Column(
         children: [
@@ -143,7 +183,19 @@ class _ShopScreenState extends State<ShopScreen> {
                                 Positioned(
                                   top: 10,
                                   right: 10,
-                                  child: Icon(Icons.favorite_border, color: Colors.grey[400]),
+                                  child: ListenableBuilder(
+                                    listenable: _wishlistManager,
+                                    builder: (context, child) {
+                                      final isInWishlist = _wishlistManager.isInWishlist(product);
+                                      return GestureDetector(
+                                        onTap: () => _wishlistManager.toggleWishlist(product),
+                                        child: Icon(
+                                          isInWishlist ? Icons.favorite : Icons.favorite_border,
+                                          color: isInWishlist ? Colors.red : Colors.grey[400],
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 )
                               ],
                             ),

@@ -38,12 +38,6 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F9FA),
-      appBar: AppBar(
-        title: const Text('My Wishlist', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF53D3D1),
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
       body: items.isEmpty
           ? Center(
               child: Column(

@@ -32,11 +32,12 @@ class _HomeScreenState extends State<HomeScreen> {
     _currentIndex = widget.initialIndex;
     _pages = [
 
-      HomeContent(),
-      ShopScreen(),
-      SearchScreen(),
-      CartScreen(),
-      AccountScreen(),
+      HomeContent(onWishlistTap: () => setState(() => _currentIndex = 1)),
+      const WishlistScreen(),
+      const ShopScreen(),
+      const SearchScreen(),
+      const CartScreen(),
+      const AccountScreen(),
     ];
   }
 
@@ -56,15 +57,19 @@ class _HomeScreenState extends State<HomeScreen> {
         unselectedItemColor: Colors.grey,
         showUnselectedLabels: true,
         items: [
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Wishlist',
+          ),
+          const BottomNavigationBarItem(
             icon: Icon(Icons.store),
             label: 'Shop Now',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Search',
           ),
@@ -81,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             label: 'Cart',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Account',
           ),
@@ -94,7 +99,8 @@ class _HomeScreenState extends State<HomeScreen> {
 // --- Content Widgets ---
 
 class HomeContent extends StatefulWidget {
-  const HomeContent({super.key});
+  final VoidCallback onWishlistTap;
+  const HomeContent({super.key, required this.onWishlistTap});
 
   @override
   State<HomeContent> createState() => _HomeContentState();
@@ -203,12 +209,7 @@ class _HomeContentState extends State<HomeContent> {
                           children: [
                             IconButton(
                               icon: const Icon(Icons.favorite_border),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const WishlistScreen()),
-                                );
-                              },
+                              onPressed: widget.onWishlistTap,
                               color: Colors.black87,
                             ),
                             ListenableBuilder(

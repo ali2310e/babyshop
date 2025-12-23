@@ -48,6 +48,18 @@ class AuthManager extends ChangeNotifier {
   String get uid => _user?.uid ?? '';
   UserProfile? get profile => _profile;
 
+  Future<UserProfile?> getUserProfile(String uid) async {
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      if (doc.exists) {
+        return UserProfile.fromFirestore(doc);
+      }
+    } catch (e) {
+      print('Error fetching user profile: $e');
+    }
+    return null;
+  }
+
   Future<void> signIn(String email, String password) async {
     try {
       print('Attempting to sign in: $email');

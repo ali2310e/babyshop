@@ -4,6 +4,7 @@ class UserProfile {
   final String uid;
   final String name;
   final String email;
+  final String phone;
   final bool isAdmin;
   final List<Address> addresses;
   final List<PaymentMethod> paymentMethods;
@@ -12,6 +13,7 @@ class UserProfile {
     required this.uid,
     required this.name,
     required this.email,
+    this.phone = '',
     this.isAdmin = false,
     this.addresses = const [],
     this.paymentMethods = const [],
@@ -23,6 +25,7 @@ class UserProfile {
       uid: doc.id,
       name: data['name'] ?? '',
       email: data['email'] ?? '',
+      phone: data['phone'] ?? '',
       isAdmin: data['role'] == 'admin',
       addresses: (data['addresses'] as List? ?? [])
           .map((item) => Address.fromMap(item))
@@ -37,6 +40,7 @@ class UserProfile {
     return {
       'name': name,
       'email': email,
+      'phone': phone,
       'addresses': addresses.map((a) => a.toMap()).toList(),
       'paymentMethods': paymentMethods.map((p) => p.toMap()).toList(),
     };

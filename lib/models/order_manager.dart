@@ -120,9 +120,12 @@ class OrderManager extends ChangeNotifier {
   Stream<List<Order>> userOrders(String userId) {
     return _firestore.collection('orders')
         .where('userId', isEqualTo: userId)
-        .orderBy('date', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => Order.fromFirestore(doc)).toList());
+        .map((snapshot) {
+          final orders = snapshot.docs.map((doc) => Order.fromFirestore(doc)).toList();
+          orders.sort((a, b) => b.date.compareTo(a.date)); // Sort locally
+          return orders;
+        });
   }
 
   Stream<List<Order>> get allOrders {

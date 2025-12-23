@@ -18,6 +18,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _addressController = TextEditingController();
   final _cityController = TextEditingController();
   final _zipController = TextEditingController();
+  final _phoneController = TextEditingController();
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _addressController.dispose();
     _cityController.dispose();
     _zipController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -105,6 +107,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             content: Column(
               children: [
                 _buildTextField('Full Name', Icons.person, _nameController),
+                const SizedBox(height: 16),
+                _buildTextField('Phone Number', Icons.phone, _phoneController),
                 const SizedBox(height: 16),
                 _buildTextField('Address', Icons.location_on, _addressController),
                 const SizedBox(height: 16),
@@ -217,6 +221,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         userId: auth.uid,
         customerName: _nameController.text.trim().isEmpty ? auth.userName : _nameController.text.trim(),
         email: auth.email,
+        phone: _phoneController.text.trim(),
         address: fullAddress,
         cartItems: _cartManager.items,
         total: _cartManager.totalAmount + 5.0,

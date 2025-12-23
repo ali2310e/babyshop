@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Product {
   final String id;
   final String name;
@@ -23,6 +25,36 @@ class Product {
     required this.reviews,
     required this.seller,
   });
+
+  factory Product.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return Product(
+      id: doc.id,
+      name: data['name'] ?? '',
+      image: data['image'] ?? '',
+      price: (data['price'] ?? 0.0).toDouble(),
+      rating: (data['rating'] ?? 0.0).toDouble(),
+      description: data['description'] ?? '',
+      category: data['category'] ?? '',
+      brand: data['brand'] ?? '',
+      reviews: (data['reviews'] as List? ?? []).map((r) => Review.fromMap(r)).toList(),
+      seller: Seller.fromMap(data['seller'] ?? {}),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'image': image,
+      'price': price,
+      'rating': rating,
+      'description': description,
+      'category': category,
+      'brand': brand,
+      'reviews': reviews.map((r) => r.toMap()).toList(),
+      'seller': seller.toMap(),
+    };
+  }
 
   void addReview(Review review) {
     reviews.insert(0, review);
@@ -113,6 +145,22 @@ class Review {
   final String comment;
 
   Review({required this.user, required this.rating, required this.comment});
+
+  factory Review.fromMap(Map<String, dynamic> map) {
+    return Review(
+      user: map['user'] ?? '',
+      rating: (map['rating'] ?? 0.0).toDouble(),
+      comment: map['comment'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'user': user,
+      'rating': rating,
+      'comment': comment,
+    };
+  }
 }
 
 class Seller {
@@ -127,4 +175,22 @@ class Seller {
     required this.totalSales,
     required this.image,
   });
+
+  factory Seller.fromMap(Map<String, dynamic> map) {
+    return Seller(
+      name: map['name'] ?? '',
+      rating: (map['rating'] ?? 0.0).toDouble(),
+      totalSales: map['totalSales'] ?? 0,
+      image: map['image'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'rating': rating,
+      'totalSales': totalSales,
+      'image': image,
+    };
+  }
 }

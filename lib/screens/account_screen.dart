@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:babyshop/models/auth_manager.dart';
+import 'package:babyshop/models/user_profile.dart';
 import 'package:babyshop/screens/signin_screen.dart';
 import 'package:babyshop/screens/wishlist_screen.dart';
 import 'package:babyshop/screens/order_history_screen.dart';
+import 'package:babyshop/screens/admin/admin_panel_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -68,6 +70,14 @@ class AccountScreen extends StatelessWidget {
                             color: Colors.grey,
                           ),
                         ),
+                      const SizedBox(height: 8),
+                      if (!AuthManager().isGuest)
+                        TextButton.icon(
+                          onPressed: () => _editProfile(context),
+                          icon: const Icon(Icons.edit, size: 16),
+                          label: const Text('Edit Profile'),
+                          style: TextButton.styleFrom(foregroundColor: const Color(0xFF53D3D1)),
+                        ),
                     ],
                   ),
                 ),
@@ -78,6 +88,14 @@ class AccountScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
+                  if (AuthManager().isAdmin)
+                    _buildAccountTile(
+                      icon: Icons.admin_panel_settings,
+                      title: 'Admin Panel',
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminPanelScreen()));
+                      },
+                    ),
                   _buildAccountTile(
                     icon: Icons.shopping_bag_outlined,
                     title: 'My Orders',
@@ -91,12 +109,12 @@ class AccountScreen extends StatelessWidget {
                   _buildAccountTile(
                     icon: Icons.location_on_outlined,
                     title: 'Shipping Addresses',
-                    onTap: () {},
+                    onTap: () => _showAddresses(context),
                   ),
                   _buildAccountTile(
                     icon: Icons.credit_card_outlined,
                     title: 'Payment Methods',
-                    onTap: () {},
+                    onTap: () => _showPaymentMethods(context),
                   ),
                   _buildAccountTile(
                     icon: Icons.favorite_border,
@@ -113,9 +131,9 @@ class AccountScreen extends StatelessWidget {
                     title: 'Help & Support',
                     onTap: () {},
                   ),
-                   _buildAccountTile(
-                    icon: Icons.logout,
-                    title: 'Logout',
+                  _buildAccountTile(
+                    icon: AuthManager().isGuest ? Icons.login : Icons.logout,
+                    title: AuthManager().isGuest ? 'Sign In / Register' : 'Logout',
                     onTap: () async {
                       await AuthManager().logout();
                       if (context.mounted) {
@@ -125,7 +143,7 @@ class AccountScreen extends StatelessWidget {
                         );
                       }
                     },
-                    isDestructive: true,
+                    isDestructive: !AuthManager().isGuest,
                   ),
                 ],
               ),
@@ -135,6 +153,216 @@ class AccountScreen extends StatelessWidget {
           ),
         );
       },
+      ),
+    );
+  }
+
+  void _editProfile(BuildContext context) {
+    final nameController = TextEditingController(text: AuthManager().userName);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Profile'),
+        content: TextField(
+          controller: nameController,
+          decoration: const InputDecoration(labelText: 'Full Name'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              await AuthManager().updateProfile(name: nameController.text.trim());
+              if (context.mounted) Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddresses(BuildContext context) {
+    if (AuthManager().isGuest) {
+      _showGuestLoginPrompt(context);
+      return;
+    }
+    // For brevity, using a dialog here, but could be a full screen
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => ListenableBuilder(
+        listenable: AuthManager(),
+        builder: (context, _) {
+          final addresses = AuthManager().profile?.addresses ?? [];
+          return Container(
+            padding: const EdgeInsets.all(24),
+            height: MediaQuery.of(context).size.height * 0.7,
+            child: Column(
+              children: [
+                const Text('Shipping Addresses', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: addresses.isEmpty 
+                    ? const Center(child: Text('No addresses saved'))
+                    : ListView.builder(
+                        itemCount: addresses.length,
+                        itemBuilder: (context, index) {
+                          final addr = addresses[index];
+                          return ListTile(
+                            title: Text(addr.label),
+                            subtitle: Text('${addr.street}, ${addr.city}'),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete_outline, color: Colors.red),
+                              onPressed: () => AuthManager().removeAddress(addr),
+                            ),
+                          );
+                        },
+                      ),
+                ),
+                ElevatedButton(
+                  onPressed: () => _addAddressDialog(context),
+                  child: const Text('Add New Address'),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _addAddressDialog(BuildContext context) {
+    final labelCtrl = TextEditingController();
+    final streetCtrl = TextEditingController();
+    final cityCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Address'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: labelCtrl, decoration: const InputDecoration(labelText: 'Label (e.g. Home)')),
+            TextField(controller: streetCtrl, decoration: const InputDecoration(labelText: 'Street')),
+            TextField(controller: cityCtrl, decoration: const InputDecoration(labelText: 'City')),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              final addr = Address(
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                label: labelCtrl.text,
+                street: streetCtrl.text,
+                city: cityCtrl.text,
+                state: '',
+                zip: '',
+              );
+              await AuthManager().addAddress(addr);
+              if (context.mounted) Navigator.pop(context);
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPaymentMethods(BuildContext context) {
+     if (AuthManager().isGuest) {
+      _showGuestLoginPrompt(context);
+      return;
+    }
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => ListenableBuilder(
+        listenable: AuthManager(),
+        builder: (context, _) {
+          final payments = AuthManager().profile?.paymentMethods ?? [];
+          return Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                const Text('Payment Methods', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Expanded(
+                  child: payments.isEmpty 
+                    ? const Center(child: Text('No payment methods saved'))
+                    : ListView.builder(
+                        itemCount: payments.length,
+                        itemBuilder: (context, index) {
+                          final p = payments[index];
+                          return ListTile(
+                            leading: const Icon(Icons.credit_card),
+                            title: Text(p.cardType),
+                            subtitle: Text(p.cardNumber),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete_outline, color: Colors.red),
+                              onPressed: () => AuthManager().removePaymentMethod(p),
+                            ),
+                          );
+                        },
+                      ),
+                ),
+                ElevatedButton(
+                  onPressed: () => _addPaymentDialog(context),
+                  child: const Text('Add Payment Method'),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _addPaymentDialog(BuildContext context) {
+    final cardCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Payment Method'),
+        content: TextField(controller: cardCtrl, decoration: const InputDecoration(labelText: 'Card Number')),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              final p = PaymentMethod(
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                cardHolderName: AuthManager().userName,
+                cardNumber: '**** **** **** ${cardCtrl.text.substring(cardCtrl.text.length > 4 ? cardCtrl.text.length - 4 : 0)}',
+                expiryDate: '12/25',
+                cardType: 'Visa',
+              );
+              await AuthManager().addPaymentMethod(p);
+              if (context.mounted) Navigator.pop(context);
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showGuestLoginPrompt(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sign In Required'),
+        content: const Text('Please sign in to manage your addresses and payments.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const SigninScreen()),
+                (route) => false,
+              );
+            },
+            child: const Text('Sign In'),
+          ),
+        ],
       ),
     );
   }

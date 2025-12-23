@@ -166,7 +166,36 @@ class _SigninScreenState extends State<SigninScreen> {
                           style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 8),
+                      TextButton(
+                        onPressed: _isLoading ? null : () async {
+                          if (_emailController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Please enter your email first.')),
+                            );
+                            return;
+                          }
+                          try {
+                            await AuthManager().sendPasswordResetEmail(_emailController.text.trim());
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Password reset email sent!')),
+                              );
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+                              );
+                            }
+                          }
+                        },
+                        child: const Text(
+                          'Forgot Password?',
+                          style: TextStyle(color: Color(0xFF53D3D1)),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                       OutlinedButton(
                         onPressed: _isLoading ? null : _guestMode,
                         style: OutlinedButton.styleFrom(

@@ -4,6 +4,7 @@ import 'package:babyshop/screens/product_detail_screen.dart';
 import 'package:babyshop/models/cart_manager.dart';
 import 'package:babyshop/models/wishlist_manager.dart';
 import 'package:babyshop/screens/wishlist_screen.dart';
+import 'package:babyshop/widgets/product_image.dart';
 
 class ShopScreen extends StatefulWidget {
   const ShopScreen({super.key});
@@ -173,8 +174,8 @@ class _ShopScreenState extends State<ShopScreen> {
                                     padding: const EdgeInsets.all(16.0),
                                     child: Hero(
                                       tag: 'shop_${product.id}', // Unique tag for this screen
-                                      child: Image.asset(
-                                        product.image,
+                                      child: ProductImage(
+                                        imagePath: product.image,
                                         fit: BoxFit.contain,
                                       ),
                                     ),

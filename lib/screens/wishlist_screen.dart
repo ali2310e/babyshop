@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:babyshop/models/wishlist_manager.dart';
 import 'package:babyshop/models/cart_manager.dart';
 import 'package:babyshop/screens/product_detail_screen.dart';
+import 'package:babyshop/widgets/product_image.dart';
 
 class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
@@ -104,7 +105,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                               ),
                               child: Hero(
                                 tag: 'product_${product.id}',
-                                child: Image.asset(product.image, fit: BoxFit.contain),
+                                child: ProductImage(imagePath: product.image, fit: BoxFit.contain),
                               ),
                             ),
                             Positioned(

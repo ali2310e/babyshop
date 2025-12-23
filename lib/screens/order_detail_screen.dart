@@ -54,9 +54,9 @@ class OrderDetailScreen extends StatelessWidget {
                         color: const Color(0xFFF5F9FA),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Image.asset(item.product.image),
+                      child: Image.asset(item.productImage),
                     ),
-                    title: Text(item.product.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    title: Text(item.productName, style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text('Qty: ${item.quantity}'),
                     trailing: Text(
                       '\$${(item.price * item.quantity).toStringAsFixed(2)}',

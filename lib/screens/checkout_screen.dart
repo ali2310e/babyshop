@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:babyshop/models/cart_manager.dart';
 import 'package:babyshop/models/order_manager.dart';
+import 'package:babyshop/models/auth_manager.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -12,6 +13,29 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final CartManager _cartManager = CartManager();
   int _currentStep = 0;
+
+  final _nameController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _zipController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final profile = AuthManager().profile;
+    if (profile != null) {
+      _nameController.text = profile.name;
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _addressController.dispose();
+    _cityController.dispose();
+    _zipController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,15 +104,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             isActive: _currentStep >= 0,
             content: Column(
               children: [
-                _buildTextField('Full Name', Icons.person),
+                _buildTextField('Full Name', Icons.person, _nameController),
                 const SizedBox(height: 16),
-                _buildTextField('Address', Icons.location_on),
+                _buildTextField('Address', Icons.location_on, _addressController),
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    Expanded(child: _buildTextField('City', Icons.location_city)),
+                    Expanded(child: _buildTextField('City', Icons.location_city, _cityController)),
                     const SizedBox(width: 12),
-                    Expanded(child: _buildTextField('Zip Code', Icons.pin_drop)),
+                    Expanded(child: _buildTextField('Zip Code', Icons.pin_drop, _zipController)),
                   ],
                 ),
               ],
@@ -99,13 +123,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             isActive: _currentStep >= 1,
             content: Column(
               children: [
-                _buildTextField('Card Number', Icons.credit_card),
+                _buildTextField('Card Number', Icons.credit_card, null),
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    Expanded(child: _buildTextField('Expiry Date', Icons.calendar_today)),
+                    Expanded(child: _buildTextField('Expiry Date', Icons.calendar_today, null)),
                     const SizedBox(width: 12),
-                    Expanded(child: _buildTextField('CVV', Icons.lock)),
+                    Expanded(child: _buildTextField('CVV', Icons.lock, null)),
                   ],
                 ),
               ],
@@ -162,8 +186,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildTextField(String label, IconData icon) {
+  Widget _buildTextField(String label, IconData icon, TextEditingController? controller) {
     return TextFormField(
+      controller: controller,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon, color: const Color(0xFF53D3D1)),
@@ -176,20 +201,30 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  void _completeOrder() {
+  void _completeOrder() async {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pop(context); // Close loading
+    try {
+      final auth = AuthManager();
+      final fullAddress = '${_addressController.text}, ${_cityController.text} - ${_zipController.text}';
       
       // Save order before clearing cart
-      OrderManager().addOrder(_cartManager.items, _cartManager.totalAmount);
+      await OrderManager().addOrder(
+        userId: auth.uid,
+        customerName: _nameController.text.trim().isEmpty ? auth.userName : _nameController.text.trim(),
+        email: auth.email,
+        address: fullAddress,
+        cartItems: _cartManager.items,
+        total: _cartManager.totalAmount + 5.0,
+      );
       
       _cartManager.clearCart();
+      if (mounted) Navigator.pop(context); // Close loading
+
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -206,15 +241,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context); // Close dialog
-                Navigator.pop(context); // Back to cart
-                Navigator.pop(context); // Back to home (or pop until home)
+                Navigator.of(context).popUntil((route) => route.isFirst);
               },
               child: const Text('Home', style: TextStyle(color: Color(0xFF53D3D1), fontWeight: FontWeight.bold)),
             ),
           ],
         ),
       );
-    });
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Close loading
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to place order: $e')));
+      }
+    }
   }
 }

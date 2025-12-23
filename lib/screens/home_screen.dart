@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:babyshop/models/product.dart';
 import 'package:babyshop/screens/product_detail_screen.dart';
 import 'package:babyshop/screens/account_screen.dart';
@@ -10,6 +11,7 @@ import 'package:babyshop/screens/wishlist_screen.dart';
 import 'package:babyshop/models/cart_manager.dart';
 import 'package:babyshop/models/auth_manager.dart';
 import 'package:babyshop/models/wishlist_manager.dart';
+import 'package:babyshop/widgets/product_image.dart';
 
 class HomeScreen extends StatefulWidget {
   final int initialIndex;
@@ -179,13 +181,28 @@ class _HomeContentState extends State<HomeContent> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('products').snapshots(),
+        builder: (context, snapshot) {
+          final products = snapshot.data?.docs.map((doc) => Product.fromFirestore(doc)).toList() ?? _products;
+          
+          final filteredProducts = products.where((product) {
+            final matchQuery = product.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                product.brand.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                product.category.toLowerCase().contains(_searchQuery.toLowerCase());
+            
+            final matchCategory = _selectedCategory == 'All' || product.category == _selectedCategory;
+
+            return matchQuery && matchCategory;
+          }).toList();
+
+          return SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                 // Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -515,8 +532,8 @@ class _HomeContentState extends State<HomeContent> {
                               child: Center(
                                 child: Hero(
                                   tag: product.id,
-                                  child: Image.asset(
-                                    product.image,
+                                  child: ProductImage(
+                                    imagePath: product.image,
                                     fit: BoxFit.contain,
                                   ),
                                 ),
@@ -584,9 +601,11 @@ class _HomeContentState extends State<HomeContent> {
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
+    },
+  ),
+);
+}
 }
 
 // (Removed placeholder classes)

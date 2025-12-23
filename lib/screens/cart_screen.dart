@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:babyshop/models/cart_manager.dart';
 import 'package:babyshop/screens/checkout_screen.dart';
+import 'package:babyshop/widgets/product_image.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -84,7 +85,7 @@ class _CartScreenState extends State<CartScreen> {
                               color: Colors.grey[100],
                               borderRadius: BorderRadius.circular(15),
                             ),
-                            child: Image.asset(item.product.image),
+                            child: ProductImage(imagePath: item.product.image),
                           ),
                           const SizedBox(width: 16),
                           Expanded(

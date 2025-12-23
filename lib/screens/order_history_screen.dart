@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:babyshop/models/order_manager.dart';
+import 'package:babyshop/models/auth_manager.dart';
 import 'package:babyshop/screens/order_detail_screen.dart';
 import 'package:intl/intl.dart';
 
@@ -8,7 +9,7 @@ class OrderHistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final orderManager = OrderManager();
+    final userId = AuthManager().uid;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F9FA),
@@ -18,10 +19,13 @@ class OrderHistoryScreen extends StatelessWidget {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: ListenableBuilder(
-        listenable: orderManager,
-        builder: (context, child) {
-          final orders = orderManager.orders;
+      body: StreamBuilder<List<Order>>(
+        stream: OrderManager().userOrders(userId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final orders = snapshot.data ?? [];
 
           if (orders.isEmpty) {
             return Center(

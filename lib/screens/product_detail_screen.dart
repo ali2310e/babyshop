@@ -3,6 +3,7 @@ import 'package:babyshop/models/product.dart';
 import 'package:babyshop/models/cart_manager.dart';
 import 'package:babyshop/models/wishlist_manager.dart';
 import 'package:babyshop/screens/home_screen.dart'; // Import HomeScreen
+import 'package:babyshop/widgets/product_image.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -56,8 +57,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   bottom: 20,
                   child: Hero(
                     tag: widget.product.id,
-                    child: Image.asset(
-                      widget.product.image,
+                    child: ProductImage(
+                      imagePath: widget.product.image,
                       height: 250,
                       fit: BoxFit.contain,
                     ),
